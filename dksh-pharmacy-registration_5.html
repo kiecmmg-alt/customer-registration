@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DKSH Healthcare — New Customer Creation Request</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --surface:#FFFFFF;
+    --surface-alt:#F6F6F7;
+    --ink:#1A1A1E;
+    --ink-soft:#6B6B72;
+    --red:#C30021;
+    --red-deep:#8F0018;
+    --red-tint:#FCEBEE;
+    --success:#1C7A46;
+    --success-tint:#E9F5EE;
+    --line:#E7E7EA;
+    --line-strong:#D3D3D8;
+    --error:#C30021;
+    --radius:8px;
+    --radius-sm:5px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', system-ui, sans-serif;
+    font-size:15px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{ max-width:1040px; margin:0 auto; padding:0 20px 80px; }
+
+  /* ===== Header ===== */
+  .masthead{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:20px 0; border-bottom:1px solid var(--line);
+  }
+  .brand{ display:flex; align-items:center; gap:11px; }
+  .brand-mark{
+    height:34px; min-width:34px; padding:0 8px; background:var(--red); border-radius:6px;
+    display:flex;align-items:center;justify-content:center; color:#fff;
+    font-weight:800; font-size:12px; letter-spacing:0.4px; flex-shrink:0;
+  }
+  .brand-text .name{ font-weight:700; font-size:16px; letter-spacing:-0.1px; color:var(--ink); }
+  .brand-text .sub{ font-size:12px; color:var(--ink-soft); font-weight:500; }
+  .doc-code{ font-size:12px; color:var(--ink-soft); text-align:right; line-height:1.6; font-weight:500; }
+  .doc-code b{color:var(--ink); font-weight:600;}
+
+  .hero{ padding:34px 0 28px; }
+  .hero-eyebrow{
+    display:inline-block; font-size:11.5px; font-weight:700; letter-spacing:0.6px;
+    text-transform:uppercase; color:var(--red); background:var(--red-tint);
+    padding:5px 11px; border-radius:999px; margin-bottom:14px;
+  }
+  .hero h1{
+    font-weight:700; font-size:clamp(24px,4vw,32px); line-height:1.2;
+    letter-spacing:-0.4px; margin:0 0 12px; max-width:660px; color:var(--ink);
+  }
+  .hero p{ color:var(--ink-soft); max-width:560px; margin:0; font-size:14.5px; }
+  .hero .form-tag{
+    display:inline-block; margin-top:12px; font-size:11px; color:var(--ink-soft);
+    font-weight:500; border:1px solid var(--line); border-radius:999px; padding:4px 10px;
+  }
+
+  /* ===== Stepper ===== */
+  .stepper{
+    display:flex; align-items:center; gap:0; margin:0 0 30px; padding:18px 20px;
+    background:var(--surface-alt); border-radius:var(--radius); border:1px solid var(--line);
+  }
+  .stepper-step{ display:flex; align-items:center; gap:9px; flex:1; cursor:pointer; }
+  .stepper-step .dot{
+    width:26px;height:26px; border-radius:50%; background:#fff; border:1.5px solid var(--line-strong);
+    color:var(--ink-soft); display:flex;align-items:center;justify-content:center;
+    font-size:12px; font-weight:700; flex-shrink:0;
+  }
+  .stepper-step .label{ font-size:12.5px; font-weight:600; color:var(--ink-soft); display:none; }
+  @media (min-width:760px){ .stepper-step .label{display:inline;} }
+  .stepper-step.active .dot{background:var(--red); border-color:var(--red); color:#fff;}
+  .stepper-step.active .label{color:var(--ink);}
+  .stepper-step.done .dot{background:var(--success); border-color:var(--success); color:#fff;}
+  .stepper-step.done .label{color:var(--ink);}
+  .stepper-line{ flex:0 0 20px; height:1.5px; background:var(--line-strong); margin:0 2px; }
+  @media (max-width:560px){ .stepper-line{flex:0 0 10px;} }
+
+  /* ===== Form card ===== */
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:30px 32px 28px; box-shadow:0 1px 2px rgba(20,20,25,0.03);
+  }
+  .step-head{ display:flex; align-items:baseline; gap:10px; margin-bottom:4px; }
+  .step-head .num{ color:var(--red); font-size:13px; font-weight:700; }
+  .step-head h2{ font-size:20px; font-weight:700; letter-spacing:-0.2px; margin:0; }
+  .step-desc{ color:var(--ink-soft); font-size:13.5px; margin:0 0 20px; }
+  .section-label{
+    font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px;
+    color:var(--red); margin:26px 0 4px; padding-top:18px; border-top:1px solid var(--line);
+  }
+  .section-label:first-of-type{ margin-top:0; padding-top:0; border-top:none; }
+  .section-sub{ font-size:12.5px; color:var(--ink-soft); margin:0 0 14px; }
+
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:16px 18px; }
+  .grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px 18px; }
+  @media (max-width:640px){ .grid2, .grid3{grid-template-columns:1fr;} }
+
+  .field{margin-bottom:16px;}
+  .field.full{grid-column:1 / -1;}
+  .field label{ display:block; font-size:12.5px; font-weight:600; color:var(--ink); margin-bottom:6px; }
+  .field .hint{ font-size:11.5px; color:var(--ink-soft); margin-top:5px; }
+  .field .err{ font-size:11.5px; color:var(--error); margin-top:5px; display:none; font-weight:500; }
+  .field.invalid .err{display:block;}
+  .field.invalid input, .field.invalid select, .field.invalid textarea{border-color:var(--error);}
+
+  input[type=text],input[type=email],input[type=tel],input[type=date],select,textarea{
+    width:100%; padding:10px 12px; border:1.5px solid var(--line-strong); border-radius:var(--radius-sm);
+    background:#fff; font-family:'Inter',sans-serif; font-size:13.5px; color:var(--ink);
+  }
+  textarea{resize:vertical; min-height:70px;}
+  input:focus,select:focus,textarea:focus{
+    outline:none; border-color:var(--red); box-shadow:0 0 0 3px var(--red-tint);
+  }
+  select{appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%236B6B72'/></svg>"); background-repeat:no-repeat; background-position:right 12px center;}
+  input[disabled]{background:var(--surface-alt); color:var(--ink-soft);}
+
+  .radio-row{display:flex; gap:18px; margin-top:2px; flex-wrap:wrap;}
+  .radio-opt{display:flex; align-items:center; gap:7px; font-size:13.5px; font-weight:500;}
+  .radio-opt input{accent-color:var(--red);}
+  .check-opt{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500;}
+  .check-opt input{accent-color:var(--red);}
+
+  fieldset{border:none; padding:0; margin:0 0 18px;}
+  legend{font-size:12.5px; font-weight:600; padding:0 0 6px;}
+
+  /* Internal-use panel */
+  .internal-panel{
+    background:var(--surface-alt); border:1px dashed var(--line-strong); border-radius:var(--radius-sm);
+    padding:16px 18px; margin-bottom:26px;
+  }
+  .internal-panel .internal-tag{
+    font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;
+    color:var(--ink-soft); margin-bottom:12px;
+  }
+
+  .biz-specify{margin-top:8px;}
+
+  .divider{ height:1px; background:var(--line); margin:22px 0; }
+
+  /* ===== Location picker ===== */
+  .loc-field{grid-column:1 / -1; margin-top:6px;}
+  .loc-head{ display:flex; align-items:center; gap:8px; font-size:14px; font-weight:700; margin-bottom:10px; }
+  .loc-head .pin-ico{color:var(--red); font-size:15px;}
+  .loc-banner{
+    display:flex; gap:10px; align-items:flex-start; background:var(--surface-alt);
+    border:1px solid var(--line); border-radius:var(--radius-sm); padding:10px 12px;
+    font-size:12px; color:var(--ink-soft); margin-bottom:12px;
+  }
+  .loc-banner b{color:var(--ink); font-weight:600;}
+  .loc-controls{display:flex; gap:8px; margin-bottom:10px;}
+  .loc-controls input{flex:1;}
+  .btn-locate{
+    white-space:nowrap; background:#fff; border:1.5px solid var(--red); color:var(--red);
+    font-weight:600; font-size:12.5px; padding:0 16px; border-radius:var(--radius-sm); cursor:pointer;
+  }
+  .btn-locate:hover{background:var(--red); color:#fff;}
+  #mapEl{ height:260px; width:100%; border-radius:var(--radius-sm); border:1px solid var(--line-strong); background:var(--surface-alt); }
+  .loc-result{
+    display:none; align-items:center; justify-content:space-between; gap:10px; margin-top:10px;
+    padding:9px 12px; background:var(--success-tint); border:1px solid var(--success);
+    border-radius:var(--radius-sm); font-size:12.5px; color:var(--success); font-weight:600;
+  }
+  .loc-result.show{display:flex;}
+  .loc-hint{font-size:11.5px; color:var(--ink-soft); margin-top:6px;}
+  .loc-autofill-note{
+    display:none; font-size:11.5px; color:var(--ink-soft); margin-top:8px;
+    padding:8px 10px; background:var(--surface-alt); border-radius:var(--radius-sm);
+  }
+  .loc-autofill-note.show{display:block;}
+
+  /* ===== Document checklist ===== */
+  .doc-group-title{ font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; color:var(--ink-soft); margin:18px 0 8px; }
+  .doc-group-title:first-child{margin-top:4px;}
+  .doc-row{
+    display:flex; align-items:center; justify-content:space-between; gap:14px; padding:12px 14px;
+    border:1.5px solid var(--line); border-radius:var(--radius-sm); margin-bottom:8px; background:#fff;
+  }
+  .doc-row.invalid{border-color:var(--error);}
+  .doc-row .doc-info{flex:1; min-width:0;}
+  .doc-row .doc-name{font-size:13px; font-weight:600; color:var(--ink); line-height:1.4;}
+  .doc-tag{ display:inline-block; font-size:10.5px; font-weight:700; padding:2px 9px; border-radius:999px; margin-top:5px; }
+  .doc-tag.required{background:var(--red-tint); color:var(--red);}
+  .doc-tag.optional{background:var(--surface-alt); color:var(--ink-soft); border:1px solid var(--line-strong);}
+  .doc-upload{ display:flex; align-items:center; gap:9px; flex-shrink:0; }
+  .doc-upload input[type=file]{ position:absolute; width:1px;height:1px; opacity:0; overflow:hidden; }
+  .doc-upload .upload-btn{
+    cursor:pointer; font-size:12px; font-weight:600; color:var(--red); border:1.5px solid var(--red);
+    padding:7px 15px; border-radius:999px; white-space:nowrap;
+  }
+  .doc-upload .upload-btn:hover{background:var(--red); color:#fff;}
+  .doc-filename{ font-size:11.5px; color:var(--ink-soft); max-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .doc-filename.set{color:var(--success); font-weight:600;}
+  .doc-empty-hint{ font-size:12.5px; color:var(--ink-soft); padding:16px; text-align:center; border:1.5px dashed var(--line-strong); border-radius:var(--radius-sm); }
+  .doc-privacy-note{font-size:11.5px; color:var(--ink-soft); margin-top:12px;}
+  .doc-derived-banner{
+    display:flex; gap:10px; align-items:flex-start; background:var(--success-tint);
+    border:1px solid var(--success); border-radius:var(--radius-sm); padding:10px 12px;
+    font-size:12.5px; color:var(--success); margin-bottom:8px;
+  }
+  .doc-derived-banner b{font-weight:700;}
+  .doc-override-link{
+    background:none; border:none; padding:0; font-size:11.5px; font-weight:600;
+    color:var(--ink-soft); text-decoration:underline; cursor:pointer;
+  }
+
+  /* Review step */
+  .review-block{ border:1px solid var(--line); border-radius:var(--radius-sm); margin-bottom:14px; overflow:hidden; }
+  .review-block-head{
+    display:flex; justify-content:space-between; align-items:center; padding:10px 14px;
+    background:var(--surface-alt); font-size:12.5px; font-weight:700; letter-spacing:0.1px; color:var(--ink);
+  }
+  .review-block-head button{ background:none;border:none; font-size:11.5px; font-weight:600; color:var(--red); text-decoration:underline; cursor:pointer; }
+  .review-rows{padding:6px 14px 12px;}
+  .review-row{ display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid var(--line); font-size:13px; }
+  .review-row:last-child{border-bottom:none;}
+  .review-row .k{color:var(--ink-soft);}
+  .review-row .v{font-weight:600; text-align:right;}
+  .review-row .v.empty{color:var(--error); font-weight:500;}
+
+  .terms{ display:flex; gap:10px; align-items:flex-start; font-size:12.5px; color:var(--ink-soft); margin:18px 0 6px; }
+  .terms input{margin-top:3px; accent-color:var(--red);}
+
+  .actions{ display:flex; justify-content:space-between; align-items:center; margin-top:26px; padding-top:20px; border-top:1px solid var(--line); }
+  .btn{ font-weight:600; font-size:13.5px; padding:11px 24px; border-radius:999px; border:1.5px solid transparent; cursor:pointer; letter-spacing:0.1px; }
+  .btn-primary{background:var(--red); color:#fff;}
+  .btn-primary:hover{background:var(--red-deep);}
+  .btn-ghost{background:none; border-color:var(--line-strong); color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--ink);}
+
+  .confirm{ text-align:center; padding:40px 20px 20px; }
+  .confirm .mark{
+    width:52px;height:52px; border-radius:50%; background:var(--success); color:#fff;
+    display:flex;align-items:center;justify-content:center; margin:0 auto 18px; font-size:24px;
+  }
+  .confirm h2{ font-size:22px; font-weight:700; letter-spacing:-0.2px; margin:0 0 10px; }
+  .confirm p{color:var(--ink-soft); max-width:420px; margin:0 auto 18px; font-size:13.5px;}
+  .ref-tag{
+    display:inline-block; font-size:13px; font-weight:700; background:var(--surface-alt);
+    border:1px solid var(--line); padding:8px 18px; border-radius:999px; letter-spacing:0.2px; color:var(--ink);
+  }
+
+  .hidden{display:none !important;}
+  footer{ text-align:center; font-size:11px; color:var(--ink-soft); margin-top:36px; letter-spacing:0.1px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="masthead">
+    <div class="brand">
+      <div class="brand-mark">DKSH</div>
+      <div class="brand-text">
+        <div class="name">DKSH Healthcare</div>
+        <div class="sub">Thailand · Distribution Partner Access</div>
+      </div>
+    </div>
+    <div class="doc-code">Form ref <b id="formRefTop">PRX-2026-000</b></div>
+  </div>
+
+  <div class="hero">
+    <span class="hero-eyebrow">New Customer Creation Request</span>
+    <h1>Open a DKSH Healthcare customer account.</h1>
+    <p>This digital form follows DKSH's standard new-customer creation request. Complete each section below and a DKSH account coordinator will process your application.</p>
+    <span class="form-tag">Based on FM-PMD-MD-01 · ใบเปิดบัญชีลูกค้าใหม่</span>
+  </div>
+
+  <div class="stepper" id="stepperEl"></div>
+
+  <div class="card">
+    <form id="regForm" novalidate>
+
+      <!-- STEP 1: Business type -->
+      <section class="step" data-step="1">
+        <div class="step-head"><span class="num">01</span><h2>Business type</h2></div>
+        <p class="step-desc">Select the category that best describes this customer's business — this uses DKSH's standard classification codes.</p>
+
+        <div class="internal-panel">
+          <div class="internal-tag">DKSH internal reference — completed by DKSH staff</div>
+          <div class="grid3">
+            <div class="field"><label for="reqDept">Department (แผนก)</label><input type="text" id="reqDept" placeholder="e.g. JJU08"></div>
+            <div class="field"><label for="reqName">Requester name (ชื่อผู้ขอ)</label><input type="text" id="reqName"></div>
+            <div class="field"><label for="reqTeam">Team</label><input type="text" id="reqTeam" placeholder="e.g. OTC"></div>
+            <div class="field"><label for="reqPhone">Contact phone (เบอร์โทรติดต่อ)</label><input type="tel" id="reqPhone"></div>
+            <div class="field"><label for="reqAreaCat">Area/CAT</label><input type="text" id="reqAreaCat"></div>
+          </div>
+        </div>
+
+        <div class="section-label">รูปแบบธุรกิจของลูกค้า</div>
+        <p class="section-sub">Customer business type *</p>
+        <div class="field full">
+          <label for="bizCategory">Customer business type *</label>
+          <select id="bizCategory">
+            <option value="">Select business type</option>
+          </select>
+        </div>
+        <div class="err" id="bizCategoryErr">Select one business type.</div>
+        <div class="field biz-specify hidden" id="bizSpecifyClinicWrap">
+          <label for="bizSpecifyClinic">Specify specialty (ระบุ)</label>
+          <input type="text" id="bizSpecifyClinic">
+        </div>
+        <div class="field biz-specify hidden" id="bizSpecifyOtherWrap">
+          <label for="bizSpecifyOther">Specify (ระบุ)</label>
+          <input type="text" id="bizSpecifyOther">
+        </div>
+      </section>
+
+      <!-- STEP 2: Account name & address -->
+      <section class="step hidden" data-step="2">
+        <div class="step-head"><span class="num">02</span><h2>Account name &amp; address</h2></div>
+        <p class="step-desc">ชื่อ-ที่อยู่สำหรับการเปิดบัญชี ออกใบกำกับภาษี และใบแจ้งหนี้ — used for tax invoices and billing.</p>
+
+        <div class="grid2">
+          <div class="field full"><label for="acctNameTh">Account name — Thai (ชื่อบัญชี ภาษาไทย) *</label><input type="text" id="acctNameTh"><div class="err">Enter the account name in Thai.</div></div>
+          <div class="field full"><label for="acctNameEn">Account name — English (ภาษาอังกฤษ)</label><input type="text" id="acctNameEn"></div>
+          <div class="field full"><label for="estName">Establishment name (ชื่อสถานประกอบการ)</label><input type="text" id="estName"></div>
+          <div class="field"><label for="taxIdAcct">Tax ID / National ID number *</label><input type="text" id="taxIdAcct" inputmode="numeric" maxlength="13" placeholder="13-digit number"><div class="err">Enter a valid 13-digit number.</div></div>
+          <div class="field"><label for="branchNo">Branch (สาขาที่ ถ้ามี)</label><input type="text" id="branchNo"></div>
+
+          <div class="field full">
+            <fieldset>
+              <legend>VAT registration status (การยืนยันสถานะการจดทะเบียนภาษีมูลค่าเพิ่ม) *</legend>
+              <div class="radio-row" id="vatStatus">
+                <label class="radio-opt"><input type="radio" name="vatStatus" value="not_registered"> ข้าพเจ้าไม่เป็นผู้ประกอบการจดทะเบียนภาษีมูลค่าเพิ่ม</label>
+                <label class="radio-opt"><input type="radio" name="vatStatus" value="registered"> ข้าพเจ้าเป็นผู้ประกอบการจดทะเบียนภาษีมูลค่าเพิ่ม</label>
+              </div>
+            </fieldset>
+            <div class="err" id="vatStatusErr">Select a VAT status.</div>
+          </div>
+        </div>
+
+        <div class="section-label">ที่อยู่ (Address)</div>
+        <div class="grid3">
+          <div class="field"><label for="addrNo">เลขที่ (No.)</label><input type="text" id="addrNo"></div>
+          <div class="field"><label for="addrMoo">หมู่ (Moo)</label><input type="text" id="addrMoo"></div>
+          <div class="field"><label for="addrVillage">หมู่บ้าน/อาคาร</label><input type="text" id="addrVillage"></div>
+          <div class="field"><label for="addrSoi">ตรอก/ซอย</label><input type="text" id="addrSoi"></div>
+          <div class="field"><label for="addrRoad">ถนน (Road)</label><input type="text" id="addrRoad"></div>
+          <div class="field"><label for="addrSubdistrict">แขวง/ตำบล</label><input type="text" id="addrSubdistrict"></div>
+          <div class="field"><label for="addrDistrict">เขต/อำเภอ</label><input type="text" id="addrDistrict"></div>
+          <div class="field"><label for="addrProvince">จังหวัด (Province) *</label><input type="text" id="addrProvince"><div class="err">Enter a province.</div></div>
+          <div class="field"><label for="addrPostcode">รหัสไปรษณีย์ (Postal code) *</label><input type="text" id="addrPostcode" inputmode="numeric" maxlength="5"><div class="err">Postal code must be 5 digits.</div></div>
+        </div>
+
+        <div class="field loc-field">
+          <div class="loc-head"><span class="pin-ico">📍</span>Pin the exact location on the map</div>
+          <div class="loc-banner">
+            <span>ℹ️</span>
+            <span><b>Drop the pin on the exact location</b> — search, tap <b>Use current location</b>, or drag the pin. Address fields above will be filled in automatically.</span>
+          </div>
+          <div class="loc-controls">
+            <input type="text" id="mapSearch" placeholder="Search place / address…">
+            <button type="button" class="btn-locate" id="locateBtn">Use current location</button>
+          </div>
+          <div id="mapEl"></div>
+          <div class="loc-result" id="locResult"><span>✓ Location selected</span><span class="coords" id="locCoords">Lat — · Lng —</span></div>
+          <div class="loc-autofill-note" id="locAutofillNote"></div>
+          <div class="loc-hint" id="locHint">No location selected yet — tap the map or search above.</div>
+          <div class="err" id="locErr">Please set the location on the map.</div>
+        </div>
+
+        <div class="section-label">ติดต่อ (Contact)</div>
+        <div class="grid3">
+          <div class="field"><label for="phone">โทรศัพท์ (Phone)</label><input type="tel" id="phone"></div>
+          <div class="field"><label for="mobile">โทรศัพท์มือถือ (Mobile) *</label><input type="tel" id="mobile" placeholder="08X-XXX-XXXX"><div class="err">Enter a valid mobile number.</div></div>
+          <div class="field"><label for="fax">โทรสาร (Fax)</label><input type="tel" id="fax"></div>
+          <div class="field"><label for="email">E-mail Address (ต้องมี) *</label><input type="email" id="email"><div class="err">Enter a valid email address.</div></div>
+          <div class="field"><label for="lineId">Line ID</label><input type="text" id="lineId"></div>
+        </div>
+
+        <div class="grid2">
+          <div class="field"><label for="contactName">ผู้ติดต่อ ชื่อ-นามสกุล (ต้องมี) *</label><input type="text" id="contactName"><div class="err">Enter the contact person's name.</div></div>
+          <div class="field"><label for="contactPhone">เบอร์โทรศัพท์ที่ติดต่อได้ *</label><input type="tel" id="contactPhone"><div class="err">Enter a reachable phone number.</div></div>
+          <div class="field"><label for="acctStaffName">จนท.บัญชี ชื่อ-นามสกุล</label><input type="text" id="acctStaffName"></div>
+          <div class="field"><label for="acctStaffPhone">เบอร์โทรศัพท์ที่ติดต่อได้</label><input type="tel" id="acctStaffPhone"></div>
+          <div class="field"><label for="purchaseStaffName">จนท.จัดซื้อ ชื่อ-นามสกุล</label><input type="text" id="purchaseStaffName"></div>
+          <div class="field"><label for="purchaseStaffPhone">เบอร์โทรศัพท์ที่ติดต่อได้</label><input type="tel" id="purchaseStaffPhone"></div>
+          <div class="field"><label for="receiverName">ผู้รับสินค้า ชื่อ-นามสกุล</label><input type="text" id="receiverName"></div>
+          <div class="field"><label for="receiverPhone">เบอร์โทรศัพท์ที่ติดต่อได้</label><input type="tel" id="receiverPhone"></div>
+          <div class="field full"><label for="receiveTime">เวลารับสินค้า (Receiving hours)</label><input type="text" id="receiveTime" placeholder="e.g. 09:00–17:00"></div>
+        </div>
+      </section>
+
+      <!-- STEP 3: Delivery -->
+      <section class="step hidden" data-step="3">
+        <div class="step-head"><span class="num">03</span><h2>Delivery address</h2></div>
+        <p class="step-desc">ชื่อ-ที่อยู่สำหรับการจัดส่งสินค้า</p>
+
+        <label class="check-opt" style="margin-bottom:16px;">
+          <input type="checkbox" id="sameAsBilling" checked>
+          ตรงกับชื่อ-ที่อยู่เจ้าของบัญชี (Same as account holder's address)
+        </label>
+
+        <div id="deliveryFieldsWrap" class="hidden">
+          <div class="field full"><label for="deliveryEstName">ชื่อสถานประกอบการ</label><input type="text" id="deliveryEstName"></div>
+          <div class="grid3">
+            <div class="field"><label for="delNo">เลขที่ (No.)</label><input type="text" id="delNo"></div>
+            <div class="field"><label for="delMoo">หมู่ (Moo)</label><input type="text" id="delMoo"></div>
+            <div class="field"><label for="delVillage">หมู่บ้าน/อาคาร</label><input type="text" id="delVillage"></div>
+            <div class="field"><label for="delSoi">ตรอก/ซอย</label><input type="text" id="delSoi"></div>
+            <div class="field"><label for="delRoad">ถนน (Road)</label><input type="text" id="delRoad"></div>
+            <div class="field"><label for="delSubdistrict">แขวง/ตำบล</label><input type="text" id="delSubdistrict"></div>
+            <div class="field"><label for="delDistrict">เขต/อำเภอ</label><input type="text" id="delDistrict"></div>
+            <div class="field"><label for="delProvince">จังหวัด (Province) *</label><input type="text" id="delProvince"><div class="err">Enter a province.</div></div>
+            <div class="field"><label for="delPostcode">รหัสไปรษณีย์ *</label><input type="text" id="delPostcode" inputmode="numeric" maxlength="5"><div class="err">Postal code must be 5 digits.</div></div>
+          </div>
+          <div class="grid3">
+            <div class="field"><label for="delPhone">โทรศัพท์</label><input type="tel" id="delPhone"></div>
+            <div class="field"><label for="delMobile">โทรศัพท์มือถือ</label><input type="tel" id="delMobile"></div>
+            <div class="field"><label for="delFax">โทรสาร</label><input type="tel" id="delFax"></div>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label for="deliveryNotes">ข้อมูลเพิ่มเติมสำหรับการส่งสินค้า และ/หรือ การชำระเงิน (ถ้ามี)</label>
+          <textarea id="deliveryNotes" placeholder="Any delivery or payment notes…"></textarea>
+        </div>
+
+        <div class="section-label">เอกสารเพิ่มเติมสำหรับลูกค้าโรงพยาบาล หรือ บริษัท</div>
+        <div class="radio-row">
+          <label class="check-opt"><input type="checkbox" id="docPO"> ใบสั่งซื้อ</label>
+          <label class="check-opt"><input type="checkbox" id="docAnalysis"> ใบวิเคราะห์</label>
+          <label class="check-opt"><input type="checkbox" id="docExtraDeliveryNote"> สำเนาใบส่งของเพิ่มเติมจากชุดปกติ</label>
+        </div>
+      </section>
+
+      <!-- STEP 4: Documents -->
+      <section class="step hidden" data-step="4">
+        <div class="step-head"><span class="num">04</span><h2>Required documents</h2></div>
+        <p class="step-desc">Based on the business type you selected in Step 1, here's the exact document checklist DKSH's account-opening process requires. Attach each file below.</p>
+
+        <div class="field full">
+          <div class="doc-derived-banner" id="docDerivedBanner"></div>
+          <button type="button" class="doc-override-link" id="docOverrideLink">Not the right checklist? Choose a different customer segment</button>
+          <div class="hidden" id="custTypeWrap" style="margin-top:10px;">
+            <label for="custType">Customer segment (for required documents)</label>
+            <select id="custType">
+              <option value="">Select customer segment</option>
+              <option value="C1">โรงพยาบาลรัฐ</option>
+              <option value="C2">โรงพยาบาลเอกชน / คลินิก (เปิดในนามบริษัท)</option>
+              <option value="C3">คลินิก (เปิดในนามบุคคล)</option>
+              <option value="C4">แพทย์ / ทันตแพทย์ / สัตวแพทย์ / เภสัชกร พยาบาล / ผู้ประกอบวิชาชีพพยาบาล</option>
+              <option value="C5">เจ้าหน้าที่โรงพยาบาล</option>
+              <option value="C6">ร้านขายยา (เปิดในนามบุคคล)</option>
+              <option value="C7">ร้านขายยา (ห้างหุ้นส่วนจำกัด)</option>
+              <option value="C8">ร้านขายยาทั่วไป</option>
+              <option value="C9">บริษัท / ห้างหุ้นส่วนจำกัดทั่วไป</option>
+              <option value="C10">รพ.สต. / อบต. / อบจ. / หน่วยงานรัฐ</option>
+              <option value="C11">สหกรณ์ / มูลนิธิ</option>
+              <option value="C12">ร้านค้าทั่วไป</option>
+            </select>
+          </div>
+          <div class="err" id="custTypeErr">Select a customer segment to see the document checklist.</div>
+        </div>
+
+        <div id="docChecklist"></div>
+        <p class="doc-privacy-note">Files stay in this browser tab for this prototype — nothing is uploaded to a server yet.</p>
+      </section>
+
+
+      <!-- STEP 5: Review -->
+      <section class="step hidden" data-step="5">
+        <div class="step-head"><span class="num">05</span><h2>Review &amp; submit</h2></div>
+        <p class="step-desc">Confirm the details below before submitting your application.</p>
+
+        <div id="reviewArea"></div>
+
+        <label class="terms">
+          <input type="checkbox" id="agreeTerms">
+          <span>ข้าพเจ้าประสงค์จะเปิดบัญชีกับบริษัทฯ เพื่อซื้อสินค้าจากบริษัทฯ และขอรับรองว่ารายละเอียดและเอกสารที่ยื่นประกอบกับใบคำขอเปิดบัญชีนี้ถูกต้องครบถ้วนและเป็นความจริงทุกประการ</span>
+        </label>
+        <div class="err" id="agreeErr" style="margin-bottom:6px;">Please confirm before submitting.</div>
+      </section>
+
+      <!-- CONFIRMATION -->
+      <section class="step hidden" data-step="confirm">
+        <div class="confirm">
+          <div class="mark">✓</div>
+          <h2>Application received</h2>
+          <p>Thank you. Your new customer creation request has been recorded. A DKSH account coordinator will contact you once it has been reviewed.</p>
+          <div class="ref-tag">REF <span id="finalRef"></span></div>
+        </div>
+      </section>
+
+      <div class="actions" id="actionBar">
+        <button type="button" class="btn btn-ghost" id="backBtn">Back</button>
+        <button type="button" class="btn btn-primary" id="nextBtn">Continue</button>
+      </div>
+
+    </form>
+  </div>
+
+  <footer>DKSH HEALTHCARE (THAILAND) LTD · PROTOTYPE FORM · BASED ON FM-PMD-MD-01 REV.04 · NOT CONNECTED TO A LIVE SYSTEM</footer>
+</div>
+
+<script>
+(function(){
+  var steps = ["1","2","3","4","5","confirm"];
+  var stepLabels = {1:"Business type",2:"Account & address",3:"Delivery",4:"Documents",5:"Review"};
+  var current = 0;
+  var data = {};
+  var storeLat = null, storeLng = null;
+  var map, marker, mapReady = false;
+
+  // ===== Business type grid (รูปแบบธุรกิจของลูกค้า) =====
+  var BIZ_CATEGORIES = [
+    {id:"gov_hospital", label:"รพ.รัฐ/หน่วยงานรัฐ", code:"G2 · MK"},
+    {id:"university_med", label:"มหาวิทยาลัย/โรงเรียนแพทย์", code:"E1 · V4"},
+    {id:"private_hospital", label:"รพ.เอกชน", code:"P8"},
+    {id:"clinic_general", label:"คลินิกทั่วไป", code:"PC"},
+    {id:"clinic_specialty", label:"คลินิกเฉพาะทาง (ระบุ)", code:"D1 · V1 · SH", specify:"bizSpecifyClinicWrap"},
+    {id:"doctor_dentist_vet", label:"แพทย์/ทันตแพทย์/สัตวแพทย์", code:"HD · V1"},
+    {id:"pharmacist_nurse_staff", label:"เภสัชกร/พยาบาล/จนท.โรงพยาบาล", code:"HK"},
+    {id:"lab", label:"แล็ป/แล็ปไดเทียม", code:"L1"},
+    {id:"company_general", label:"บริษัท/ห้างร้านทั่วไป", code:"I3"},
+    {id:"pharmacy", label:"ร้านขายยา", code:"D0 · W7 · V2"},
+    {id:"convenience_store", label:"ร้านสะดวกซื้อ", code:"C9 · G4 · HL"},
+    {id:"department_store", label:"ห้างสรรพสินค้า/ซุปเปอร์", code:"H6 · D2 · S6"},
+    {id:"chain_pharmacy", label:"ร้านยาแบบเครือข่าย/Chain", code:"CK"},
+    {id:"online_business", label:"ธุรกิจออนไลน์", code:"E0 · EC"},
+    {id:"farm", label:"ฟาร์ม", code:"F1"},
+    {id:"pet_supplies", label:"ร้านอาหารและอุปกรณ์สัตว์เลี้ยง", code:"P1"},
+    {id:"eyewear", label:"ร้านแว่นตา", code:"O1"},
+    {id:"medical_supplies", label:"ร้านวัสดุอุปกรณ์ทางการแพทย์", code:"MG"},
+    {id:"other", label:"อื่นๆ (ระบุ)", code:"", specify:"bizSpecifyOtherWrap"}
+  ];
+  var bizSelect = document.getElementById('bizCategory');
+  BIZ_CATEGORIES.forEach(function(cat){
+    var opt = document.createElement('option');
+    opt.value = cat.id;
+    opt.textContent = cat.label + (cat.code ? ' (' + cat.code + ')' : '');
+    bizSelect.appendChild(opt);
+  });
+  bizSelect.addEventListener('change', function(){
+    document.getElementById('bizSpecifyClinicWrap').classList.add('hidden');
+    document.getElementById('bizSpecifyOtherWrap').classList.add('hidden');
+    var cat = BIZ_CATEGORIES.find(function(c){ return c.id === bizSelect.value; });
+    if (cat && cat.specify) document.getElementById(cat.specify).classList.remove('hidden');
+    setInvalid(bizSelect.closest('.field'), false);
+    document.getElementById('bizCategoryErr').style.display = 'none';
+    manualSegmentOverride = null;
+    attachedFiles = {};
+  });
+
+  // ===== Document requirements by customer segment =====
+  var DOC_ITEMS = {
+    1: "สำเนาบัตรประชาชน / สำเนาบัตรข้าราชการของผู้มีอำนาจลงนาม",
+    2: "สำเนาใบประกอบโรคศิลป์ / ใบอนุญาตประกอบวิชาชีพ",
+    3: "สำเนาบัตรข้าราชการ / สำเนาบัตรพนักงาน / สำเนาหนังสือรับรองความเป็นเจ้าหน้าที่ของโรงพยาบาล",
+    4: "สำเนาทะเบียนบ้านของผู้มีอำนาจลงนาม",
+    5: "สำเนาหนังสือรับรองบริษัท",
+    6: "สำเนาบัตรประจำตัวผู้เสียภาษี / ภพ.20 / ภพ.09 / ภพ.01",
+    7: "สำเนาใบทะเบียนพาณิชย์",
+    8: "สำเนาใบอนุญาตขายยา",
+    9: "สำเนาใบอนุญาตดำเนินการสถานพยาบาล (สพ.19) / สำเนาใบอนุญาตดำเนินการสถานพยาบาลสัตว์ (สส.4)",
+    10: "สำเนาใบอนุญาตประกอบการสถานพยาบาล (สพ.7) / สำเนาใบอนุญาตเป็นผู้ตั้งสถานพยาบาลสัตว์ (สส.3)",
+    11: "สำเนาหนังสือรับรองการจัดตั้งสหกรณ์ / มูลนิธิ",
+    12: "สำเนาใบจัดตั้ง (สำหรับห้างหุ้นส่วนสามัญ / คณะบุคคล)",
+    13: "หนังสือยืนยัน / หนังสือรับรองจากต้นสังกัดหน่วยงาน",
+    14: "หนังสือให้ความยินยอมในการเปิดเผยข้อมูลส่วนบุคคล"
+  };
+  var BUSINESS_TYPES = {
+    C1:  {label:"โรงพยาบาลรัฐ", required:[1,6,13], conditional:[]},
+    C2:  {label:"โรงพยาบาลเอกชน / คลินิก (เปิดในนามบริษัท)", required:[1,2,4,5,9,10], conditional:[6]},
+    C3:  {label:"คลินิก (เปิดในนามบุคคล)", required:[1,2,4,9,10], conditional:[6]},
+    C4:  {label:"แพทย์ / ทันตแพทย์ / สัตวแพทย์ / เภสัชกร พยาบาล / ผู้ประกอบวิชาชีพพยาบาล", required:[1,2,4], conditional:[9,10]},
+    C5:  {label:"เจ้าหน้าที่โรงพยาบาล", required:[1,3,4], conditional:[6]},
+    C6:  {label:"ร้านขายยา (เปิดในนามบุคคล)", required:[1,6,8], conditional:[]},
+    C7:  {label:"ร้านขายยา (ห้างหุ้นส่วนจำกัด)", required:[1,4,5,7,8,12], conditional:[6]},
+    C8:  {label:"ร้านขายยาทั่วไป", required:[1,4,7,8], conditional:[6]},
+    C9:  {label:"บริษัท / ห้างหุ้นส่วนจำกัดทั่วไป", required:[1,5,6,14], conditional:[]},
+    C10: {label:"รพ.สต. / อบต. / อบจ. / หน่วยงานรัฐ", required:[1,6,13,14], conditional:[]},
+    C11: {label:"สหกรณ์ / มูลนิธิ", required:[1,11], conditional:[9,10]},
+    C12: {label:"ร้านค้าทั่วไป", required:[1,4,7], conditional:[6]}
+  };
+  var attachedFiles = {};
+
+  // Maps each Step 1 business type (19 categories from the official form) to the closest
+  // customer segment in the document-requirements table (12 categories from a separate
+  // DKSH checklist). This mapping is my best-effort judgment call, not a confirmed 1:1
+  // source — flagged so it can be corrected if a segment looks wrong.
+  var BIZ_TO_SEGMENT = {
+    gov_hospital: "C1",
+    university_med: "C2",
+    private_hospital: "C2",
+    clinic_general: "C3",
+    clinic_specialty: "C3",
+    doctor_dentist_vet: "C4",
+    pharmacist_nurse_staff: "C4",
+    lab: "C9",
+    company_general: "C9",
+    pharmacy: "C8",
+    convenience_store: "C12",
+    department_store: "C9",
+    chain_pharmacy: "C7",
+    online_business: "C12",
+    farm: "C12",
+    pet_supplies: "C12",
+    eyewear: "C12",
+    medical_supplies: "C9",
+    other: "C12"
+  };
+  var manualSegmentOverride = null;
+
+  function docRow(id, required){
+    var filename = attachedFiles[id];
+    return '<div class="doc-row" data-doc="'+id+'">'+
+      '<div class="doc-info"><div class="doc-name">'+DOC_ITEMS[id]+'</div>'+
+      '<span class="doc-tag '+(required?'required':'optional')+'">'+(required?'Required':'If applicable')+'</span></div>'+
+      '<div class="doc-upload">'+
+        '<span class="doc-filename '+(filename?'set':'')+'">'+(filename ? ('✓ '+filename) : 'No file')+'</span>'+
+        '<label class="upload-btn">Attach<input type="file" data-doc-input="'+id+'"></label>'+
+      '</div></div>';
+  }
+  function wireDocInputs(){
+    document.querySelectorAll('[data-doc-input]').forEach(function(inp){
+      inp.addEventListener('change', function(){
+        var id = inp.getAttribute('data-doc-input');
+        if (inp.files && inp.files[0]) attachedFiles[id] = inp.files[0].name;
+        else delete attachedFiles[id];
+        var row = inp.closest('.doc-row');
+        row.classList.remove('invalid');
+        var fnEl = row.querySelector('.doc-filename');
+        if (attachedFiles[id]){ fnEl.textContent = '✓ ' + attachedFiles[id]; fnEl.classList.add('set'); }
+        else { fnEl.textContent = 'No file'; fnEl.classList.remove('set'); }
+      });
+    });
+  }
+  function activeSegment(){
+    if (manualSegmentOverride) return manualSegmentOverride;
+    return BIZ_TO_SEGMENT[bizSelect.value] || "";
+  }
+  function renderDerivedBanner(){
+    var banner = document.getElementById('docDerivedBanner');
+    var bizCat = BIZ_CATEGORIES.find(function(c){ return c.id === bizSelect.value; });
+    var seg = activeSegment();
+    var segLabel = seg && BUSINESS_TYPES[seg] ? BUSINESS_TYPES[seg].label : "";
+    if (!bizCat){
+      banner.innerHTML = 'No business type selected in Step 1 yet.';
+      return;
+    }
+    banner.innerHTML = '✓ Using <b>' + bizCat.label + '</b> from Step 1' + (segLabel ? ' → document set: <b>' + segLabel + '</b>' : '');
+  }
+  function renderDocChecklist(){
+    renderDerivedBanner();
+    var sel = document.getElementById('custType');
+    if (sel.value !== activeSegment()) sel.value = activeSegment();
+    var segKey = activeSegment();
+    var container = document.getElementById('docChecklist');
+    if (!segKey){ container.innerHTML = '<div class="doc-empty-hint">Go back to Step 1 and select a business type to see the required document checklist.</div>'; return; }
+    var type = BUSINESS_TYPES[segKey];
+    var html = '<div class="doc-group-title">Required — '+type.required.length+' document'+(type.required.length>1?'s':'')+'</div>';
+    type.required.forEach(function(id){ html += docRow(id, true); });
+    if (type.conditional.length){
+      html += '<div class="doc-group-title">If applicable</div>';
+      type.conditional.forEach(function(id){ html += docRow(id, false); });
+    }
+    container.innerHTML = html;
+    wireDocInputs();
+  }
+  document.getElementById('docOverrideLink').addEventListener('click', function(){
+    document.getElementById('custTypeWrap').classList.toggle('hidden');
+  });
+  document.getElementById('custType').addEventListener('change', function(){
+    manualSegmentOverride = document.getElementById('custType').value || null;
+    attachedFiles = {};
+    setInvalid(document.getElementById('custType').closest('.field'), false);
+    renderDocChecklist();
+  });
+  renderDocChecklist();
+
+  // ===== Map / geocoding =====
+  function initMap(){
+    if (mapReady) return;
+    mapReady = true;
+    var startLat = 13.7563, startLng = 100.5018;
+    map = L.map('mapEl', {scrollWheelZoom:false}).setView([startLat, startLng], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+    var pinIcon = L.divIcon({
+      className:'',
+      html:'<div style="width:26px;height:26px;border-radius:50% 50% 50% 0;background:#C30021;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.35);"></div>',
+      iconSize:[26,26], iconAnchor:[13,26]
+    });
+    marker = L.marker([startLat, startLng], {icon:pinIcon, draggable:true}).addTo(map);
+    marker.on('dragend', function(){ var p = marker.getLatLng(); setLocation(p.lat, p.lng); });
+    map.on('click', function(e){ marker.setLatLng(e.latlng); setLocation(e.latlng.lat, e.latlng.lng); });
+  }
+  function setLocation(lat, lng){
+    storeLat = lat; storeLng = lng;
+    document.getElementById('locCoords').textContent = 'Lat ' + lat.toFixed(6) + ' · Lng ' + lng.toFixed(6);
+    document.getElementById('locResult').classList.add('show');
+    document.getElementById('locHint').style.display = 'none';
+    document.getElementById('mapEl').closest('.loc-field').classList.remove('invalid');
+    reverseGeocode(lat, lng);
+  }
+  function reverseGeocode(lat, lng){
+    var noteEl = document.getElementById('locAutofillNote');
+    noteEl.textContent = 'Filling in address details…';
+    noteEl.classList.add('show');
+    fetch('https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&lat=' + lat + '&lon=' + lng)
+      .then(function(r){
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(res){
+        if (res && res.error) throw new Error(res.error);
+        fillAddressFromGeocode(res);
+        noteEl.textContent = 'Address fields above were filled in from the pin — please check them.';
+      })
+      .catch(function(err){
+        console.error('Reverse geocoding failed:', err);
+        noteEl.textContent = "Couldn't auto-fill the address (" + (err && err.message ? err.message : 'network blocked') + ") — please enter it manually above.";
+      });
+  }
+  function fillAddressFromGeocode(res){
+    var addr = (res && res.address) ? res.address : {};
+    var houseNumber = addr.house_number || '';
+    var road = addr.road || addr.pedestrian || '';
+    var subdistrict = addr.suburb || addr.quarter || addr.neighbourhood || '';
+    var district = addr.city_district || addr.district || '';
+    var province = addr.state || addr.province || addr.city || addr.town || '';
+    var postcode = addr.postcode || '';
+
+    if (houseNumber) document.getElementById('addrNo').value = houseNumber;
+    if (road) document.getElementById('addrRoad').value = road;
+    if (subdistrict) document.getElementById('addrSubdistrict').value = subdistrict;
+    if (district) document.getElementById('addrDistrict').value = district;
+    if (province) document.getElementById('addrProvince').value = province;
+    if (postcode) document.getElementById('addrPostcode').value = postcode;
+
+    setInvalid(document.getElementById('addrProvince').closest('.field'), false);
+    setInvalid(document.getElementById('addrPostcode').closest('.field'), false);
+  }
+  document.getElementById('locateBtn').addEventListener('click', function(){
+    if (!navigator.geolocation){ alert('Location services are not available in this browser.'); return; }
+    var btn = document.getElementById('locateBtn');
+    btn.textContent = 'Locating…';
+    navigator.geolocation.getCurrentPosition(function(pos){
+      btn.textContent = 'Use current location';
+      var lat = pos.coords.latitude, lng = pos.coords.longitude;
+      map.setView([lat,lng], 16); marker.setLatLng([lat,lng]); setLocation(lat,lng);
+    }, function(){
+      btn.textContent = 'Use current location';
+      alert('Could not get your current location. Please search or drag the pin instead.');
+    });
+  });
+  var searchInput = document.getElementById('mapSearch');
+  searchInput.addEventListener('keydown', function(e){
+    if (e.key === 'Enter'){ e.preventDefault(); runSearch(searchInput.value.trim()); }
+  });
+  function runSearch(query){
+    if (!query) return;
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(query))
+      .then(function(r){ return r.json(); })
+      .then(function(results){
+        if (!results || !results.length){ alert('No matching place found — try a broader search or drop the pin manually.'); return; }
+        var lat = parseFloat(results[0].lat), lng = parseFloat(results[0].lon);
+        map.setView([lat,lng], 17); marker.setLatLng([lat,lng]); setLocation(lat,lng);
+      })
+      .catch(function(){ alert('Search is unavailable right now — drop the pin manually or drag it into place.'); });
+  }
+
+  // ===== Same as billing toggle =====
+  var sameAsBilling = document.getElementById('sameAsBilling');
+  var deliveryWrap = document.getElementById('deliveryFieldsWrap');
+  function toggleDelivery(){
+    deliveryWrap.classList.toggle('hidden', sameAsBilling.checked);
+  }
+  sameAsBilling.addEventListener('change', toggleDelivery);
+  toggleDelivery();
+
+  // ===== Step machine =====
+  function refCode(){ return "PRX-2026-" + Math.floor(1000 + Math.random()*8999); }
+  var ref = refCode();
+  document.getElementById('formRefTop').textContent = ref;
+
+  var stepperEl = document.getElementById('stepperEl');
+  function renderStepper(){
+    stepperEl.innerHTML = "";
+    [1,2,3,4,5].forEach(function(n, i){
+      var div = document.createElement('div');
+      var state = "";
+      if (current === n-1) state = "active"; else if (current > n-1) state = "done";
+      div.className = "stepper-step " + state;
+      div.innerHTML = '<span class="dot">'+(current > n-1 ? '✓' : n)+'</span><span class="label">'+stepLabels[n]+'</span>';
+      stepperEl.appendChild(div);
+      if (i < 4){ var line = document.createElement('div'); line.className = 'stepper-line'; stepperEl.appendChild(line); }
+    });
+  }
+
+  function showStep(idx){
+    document.querySelectorAll('.step').forEach(function(s){ s.classList.add('hidden'); });
+    document.querySelector('.step[data-step="'+steps[idx]+'"]').classList.remove('hidden');
+    renderStepper();
+    var actionBar = document.getElementById('actionBar');
+    var backBtn = document.getElementById('backBtn');
+    var nextBtn = document.getElementById('nextBtn');
+    if (steps[idx] === "confirm"){ actionBar.classList.add('hidden'); stepperEl.classList.add('hidden'); return; }
+    actionBar.classList.remove('hidden'); stepperEl.classList.remove('hidden');
+    backBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
+    nextBtn.textContent = steps[idx] === "5" ? "Submit application" : "Continue";
+    if (steps[idx] === "2"){ initMap(); setTimeout(function(){ if (map) map.invalidateSize(); }, 50); }
+    if (steps[idx] === "4") renderDocChecklist();
+    if (steps[idx] === "5") renderReview();
+  }
+
+  function setInvalid(fieldEl, invalid){ if (fieldEl) fieldEl.classList.toggle('invalid', invalid); }
+
+  function validateStep(n){
+    var ok = true;
+    if (n === "1"){
+      var bizChecked = bizSelect.value ? {value: bizSelect.value} : null;
+      document.getElementById('bizCategoryErr').style.display = bizChecked ? 'none' : 'block';
+      setInvalid(bizSelect.closest('.field'), !bizChecked);
+      if (!bizChecked) ok = false;
+      else {
+        var cat = BIZ_CATEGORIES.find(function(c){ return c.id === bizChecked.value; });
+        if (cat && cat.specify){
+          var specifyInput = document.querySelector('#'+cat.specify+' input');
+          var invalid = specifyInput.value.trim().length === 0;
+          setInvalid(specifyInput.closest('.field'), invalid);
+          if (invalid) ok = false;
+        }
+      }
+    }
+    if (n === "2"){
+      ["acctNameTh","contactName","contactPhone"].forEach(function(id){
+        var el = document.getElementById(id);
+        var invalid = el.value.trim().length === 0;
+        setInvalid(el.closest('.field'), invalid);
+        if (invalid) ok = false;
+      });
+      var taxId = document.getElementById('taxIdAcct');
+      var taxValid = /^\d{13}$/.test(taxId.value.trim());
+      setInvalid(taxId.closest('.field'), !taxValid);
+      if (!taxValid) ok = false;
+
+      var vatChecked = document.querySelector('input[name="vatStatus"]:checked');
+      var vatErr = document.getElementById('vatStatusErr');
+      vatErr.style.display = vatChecked ? 'none' : 'block';
+      if (!vatChecked) ok = false;
+
+      var province = document.getElementById('addrProvince');
+      var provInvalid = province.value.trim().length === 0;
+      setInvalid(province.closest('.field'), provInvalid);
+      if (provInvalid) ok = false;
+
+      var postcode = document.getElementById('addrPostcode');
+      var postValid = /^\d{5}$/.test(postcode.value.trim());
+      setInvalid(postcode.closest('.field'), !postValid);
+      if (!postValid) ok = false;
+
+      var mobile = document.getElementById('mobile');
+      var mobileValid = /^[0-9\-\s]{9,10}$/.test(mobile.value.trim());
+      setInvalid(mobile.closest('.field'), !mobileValid);
+      if (!mobileValid) ok = false;
+
+      var email = document.getElementById('email');
+      var emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
+      setInvalid(email.closest('.field'), !emailValid);
+      if (!emailValid) ok = false;
+
+      var locField = document.getElementById('mapEl').closest('.loc-field');
+      var locValid = storeLat !== null && storeLng !== null;
+      setInvalid(locField, !locValid);
+      if (!locValid) ok = false;
+    }
+    if (n === "3"){
+      if (!sameAsBilling.checked){
+        var delProvince = document.getElementById('delProvince');
+        var delProvInvalid = delProvince.value.trim().length === 0;
+        setInvalid(delProvince.closest('.field'), delProvInvalid);
+        if (delProvInvalid) ok = false;
+
+        var delPostcode = document.getElementById('delPostcode');
+        var delPostValid = /^\d{5}$/.test(delPostcode.value.trim());
+        setInvalid(delPostcode.closest('.field'), !delPostValid);
+        if (!delPostValid) ok = false;
+      }
+    }
+    if (n === "4"){
+      var segKey = activeSegment();
+      var errEl = document.getElementById('custTypeErr');
+      if (!segKey){
+        errEl.style.display = 'block';
+        ok = false;
+      } else {
+        errEl.style.display = 'none';
+        var type = BUSINESS_TYPES[segKey];
+        type.required.forEach(function(id){
+          var row = document.querySelector('.doc-row[data-doc="'+id+'"]');
+          var missing = !attachedFiles[id];
+          if (row) row.classList.toggle('invalid', missing);
+          if (missing) ok = false;
+        });
+      }
+    }
+    if (n === "5"){
+      var agree = document.getElementById('agreeTerms');
+      var errEl = document.getElementById('agreeErr');
+      if (!agree.checked){ errEl.style.display = 'block'; ok = false; }
+      else { errEl.style.display = 'none'; }
+    }
+    return ok;
+  }
+
+  function val(id){ return document.getElementById(id).value.trim(); }
+
+  function collect(){
+    var bizChecked = bizSelect.value ? {value: bizSelect.value} : null;
+    var bizCat = bizChecked ? BIZ_CATEGORIES.find(function(c){ return c.id === bizChecked.value; }) : null;
+    var bizLabel = bizCat ? bizCat.label : "";
+    if (bizCat && bizCat.specify) bizLabel += ' — ' + val(bizCat.specify.replace('Wrap',''));
+    var vatChecked = document.querySelector('input[name="vatStatus"]:checked');
+
+    data = {
+      bizCategory: bizLabel,
+      acctNameTh: val('acctNameTh'), acctNameEn: val('acctNameEn'), estName: val('estName'),
+      taxIdAcct: val('taxIdAcct'), branchNo: val('branchNo'),
+      vatStatus: vatChecked ? (vatChecked.value === 'registered' ? 'VAT registered' : 'Not VAT registered') : "",
+      addr: [val('addrNo'), val('addrMoo') ? ('หมู่ '+val('addrMoo')) : '', val('addrVillage'), val('addrSoi'), val('addrRoad')].filter(Boolean).join(' '),
+      addrArea: [val('addrSubdistrict'), val('addrDistrict'), val('addrProvince'), val('addrPostcode')].filter(Boolean).join(' '),
+      storeLocation: (storeLat !== null && storeLng !== null) ? (storeLat.toFixed(6) + ', ' + storeLng.toFixed(6)) : "",
+      phone: val('phone'), mobile: val('mobile'), fax: val('fax'), email: val('email'), lineId: val('lineId'),
+      contactName: val('contactName'), contactPhone: val('contactPhone'),
+      acctStaffName: val('acctStaffName'), purchaseStaffName: val('purchaseStaffName'),
+      receiverName: val('receiverName'), receiveTime: val('receiveTime'),
+      sameAsBilling: sameAsBilling.checked,
+      delAddr: [val('delNo'), val('delMoo') ? ('หมู่ '+val('delMoo')) : '', val('delVillage'), val('delSoi'), val('delRoad'), val('delSubdistrict'), val('delDistrict'), val('delProvince'), val('delPostcode')].filter(Boolean).join(' '),
+      custType: (function(){ var seg = activeSegment(); return (seg && BUSINESS_TYPES[seg]) ? BUSINESS_TYPES[seg].label : ""; })()
+    };
+  }
+
+  function row(k,v){
+    var empty = !v;
+    return '<div class="review-row"><span class="k">'+k+'</span><span class="v '+(empty?'empty':'')+'">'+(v || 'Not provided')+'</span></div>';
+  }
+  function block(title, stepNum, rowsHtml){
+    return '<div class="review-block"><div class="review-block-head"><span>'+title+'</span><button type="button" data-goto="'+stepNum+'">Edit</button></div><div class="review-rows">'+rowsHtml+'</div></div>';
+  }
+  function renderReview(){
+    collect();
+    var html = "";
+    html += block("Business type", 0, row("Category", data.bizCategory));
+    html += block("Account name & address", 1,
+      row("Account name (Thai)", data.acctNameTh) +
+      row("Account name (English)", data.acctNameEn) +
+      row("Establishment name", data.estName) +
+      row("Tax ID / ID number", data.taxIdAcct) +
+      row("Branch", data.branchNo) +
+      row("VAT status", data.vatStatus) +
+      row("Address", data.addr) +
+      row("Sub-district/District/Province/Postcode", data.addrArea) +
+      row("Map pin", data.storeLocation) +
+      row("Phone", data.phone) + row("Mobile", data.mobile) + row("Email", data.email) + row("Line ID", data.lineId) +
+      row("Contact person", data.contactName) + row("Contact phone", data.contactPhone) +
+      row("Accounting staff", data.acctStaffName) + row("Purchasing staff", data.purchaseStaffName) +
+      row("Goods receiver", data.receiverName) + row("Receiving hours", data.receiveTime)
+    );
+    html += block("Delivery address", 2,
+      data.sameAsBilling ? row("Delivery address", "Same as account holder's address") : row("Delivery address", data.delAddr)
+    );
+    var docRowsHtml = row("Customer segment", data.custType);
+    var selType = activeSegment();
+    if (selType && BUSINESS_TYPES[selType]){
+      BUSINESS_TYPES[selType].required.forEach(function(id){ docRowsHtml += row(DOC_ITEMS[id], attachedFiles[id] || ""); });
+    }
+    html += block("Required documents", 3, docRowsHtml);
+    document.getElementById('reviewArea').innerHTML = html;
+    document.querySelectorAll('[data-goto]').forEach(function(btn){
+      btn.addEventListener('click', function(){ current = parseInt(btn.getAttribute('data-goto'), 10); showStep(current); });
+    });
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', function(){
+    var stepKey = steps[current];
+    if (!validateStep(stepKey)) return;
+    if (stepKey === "5"){
+      document.getElementById('finalRef').textContent = ref;
+      current = steps.indexOf("confirm");
+      showStep(current);
+      return;
+    }
+    current++; showStep(current);
+    document.querySelector('.card').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+  document.getElementById('backBtn').addEventListener('click', function(){
+    if (current === 0) return;
+    current--; showStep(current);
+  });
+
+  showStep(current);
+})();
+</script>
+
+</body>
+</html>
